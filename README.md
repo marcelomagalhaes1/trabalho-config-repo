@@ -10,8 +10,11 @@ O projeto utiliza o padrão Configuração Centralizada, amplamente empregado em
 🔧 Componentes:
 Serviço	Porta	Função
 config-server	8888	Ele lê as configurações do Git e as entrega via HTTP
+
 cliente-vendas	8081	Microserviço com configurações remotas
+
 cliente-estoque	8082	Microserviço com configurações remotas
+
 cliente-relatorios	8083	Microserviço com configurações remotas
 
 🔗 Comunicação Cliente-Servidor

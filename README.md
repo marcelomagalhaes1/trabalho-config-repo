@@ -8,14 +8,17 @@ O ambiente é composto por um Config Server e três aplicações clientes que co
 O projeto utiliza o padrão Configuração Centralizada, amplamente empregado em arquiteturas distribuídas.
 
 🔧 Componentes:
-Serviço	Porta	Função
-config-server	8888	Ele lê as configurações do Git e as entrega via HTTP
 
-cliente-vendas	8081	Microserviço com configurações remotas
+Serviço	               Porta	             Função
 
-cliente-estoque	8082	Microserviço com configurações remotas
+config-server	       8888	                 Ele lê as configurações do Git e as entrega via HTTP
 
-cliente-relatorios	8083	Microserviço com configurações remotas
+cliente-vendas	       8081	                 Microserviço com configurações remotas
+
+cliente-estoque	       8082	                 Microserviço com configurações remotas
+
+cliente-relatorios	   8083	                 Microserviço com configurações remotas
+
 
 🔗 Comunicação Cliente-Servidor
 
@@ -24,7 +27,9 @@ O Config Server atua como ponto central, lendo arquivos .properties de um reposi
 Os Clientes usam a dependência spring-cloud-config-client para buscar suas configurações de forma automática antes mesmo de inicializar o Spring Boot.
 
 A comunicação ocorre via HTTP com o endpoint base:
-http://localhost:8888
+
+-http://localhost:8888
+
 
 ⚙️ Fluxo de Inicialização e Obtenção de Configurações
 
@@ -38,14 +43,16 @@ Utiliza @EnableConfigServer
 
 Lê a propriedade:
 
-spring.cloud.config.server.git.uri
-
+-spring.cloud.config.server.git.uri
 
 Conecta-se ao repositório Git e carrega arquivos como:
 
-cliente-vendas-dev.properties
-cliente-estoque-dev.properties
-cliente-relatorios-dev.properties
+-cliente-vendas-dev.properties
+
+-cliente-estoque-dev.properties
+
+-cliente-relatorios-dev.properties
+
 
 2️⃣ Inicialização de um Cliente
 
@@ -63,6 +70,7 @@ cliente-vendas = spring.application.name
 
 dev = spring.profiles.active
 
+
 4️⃣ Entrega da Configuração
 
 O Config Server retorna um JSON contendo as propriedades, por exemplo:
@@ -72,31 +80,50 @@ O Config Server retorna um JSON contendo as propriedades, por exemplo:
   "mensagem.boasvindas": "Bem-vindo ao sistema de Vendas - Ambiente DEV"
 }
 
+
 5️⃣ Carregamento e Inicialização Final
 
 O cliente injeta essas propriedades no seu contexto Spring e só então completa sua inicialização.
 
+
+
 🔑 Função de Cada Propriedade Importante
+
 📌 No Config Server (config-server/application.properties)
+
 Propriedade	Função
+
 spring.cloud.config.server.git.uri	URL do repositório Git onde estão as configs
+
 server.port	Porta do Config Server (8888)
 
 📌 Nos Clientes (cliente-*/application.properties)
+
 Propriedade	Função
+
 spring.application.name	Nome do microserviço (define qual arquivo .properties buscar)
+
 spring.profiles.active	Define ambiente (ex: dev)
+
 spring.config.import	URL do Config Server (ex: optional:configserver:http://localhost:8888)
 
 📌 No Repositório Git (*.properties)
+
 Propriedade	Função
+
 server.port	Porta onde o cliente irá rodar (vem do Git, não local)
+
 mensagem.boasvindas	Mensagem exibida pelo endpoint /mensagem
+
 🧪 Testes e Verificações
+
 🔍 Testes no Config Server
-URL	Função	Resultado
-http://localhost:8888/cliente-vendas/dev	Verifica leitura do arquivo remoto	JSON com server.port:8081
-http://localhost:8888/actuator/health	Verifica saúde do serviço	UP
+
+URL	                                         Função	                                 Resultado
+
+http://localhost:8888/cliente-vendas/dev	 Verifica leitura do arquivo remoto	     JSON com server.port:8081
+
+http://localhost:8888/actuator/health	     Verifica saúde do serviço	             UP
 
 ✔️ Ambos funcionando corretamente.
 
@@ -104,13 +131,13 @@ http://localhost:8888/actuator/health	Verifica saúde do serviço	UP
 
 O endpoint /mensagem foi testado em cada microserviço:
 
-Serviço	Porta	URL	Resultado
-Vendas	8081	http://localhost:8081/mensagem
-	“Bem-vindo ao sistema de Vendas - Ambiente DEV”
-Estoque	8082	http://localhost:8082/mensagem
-	“Serviço de Estoque inicializado - Ambiente DEV”
-Relatórios	8083	http://localhost:8083/mensagem
-	“Serviço de Relatórios em execução - Ambiente DEV”
+Serviço	         Porta	            URL	                                              Resultado
+
+Vendas	         8081	            http://localhost:8081/mensagem                  “Bem-vindo ao sistema de Vendas - Ambiente DEV”
+
+Estoque	         8082	            http://localhost:8082/mensagem                  “Serviço de Estoque inicializado - Ambiente DEV”
+
+Relatórios	     8083	            http://localhost:8083/mensagem                  “Serviço de Relatórios em execução - Ambiente DEV”
 
 ✔️ Todos os clientes receberam e injetaram suas configurações corretamente.
 
